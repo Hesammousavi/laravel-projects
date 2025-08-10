@@ -1,0 +1,19 @@
+<?php
+
+namespace Modules\Auth\Enums;
+
+enum VerificationActionType : string {
+    case REGISTER = 'register';
+    case LOGIN = 'login';
+
+
+    public function isContactNeedToBeUnique(): bool
+    {
+        return in_array($this, [self::REGISTER]);
+    }
+
+    public function isContactNeedToBeExsit(): bool
+    {
+        return in_array($this, haystack: [self::LOGIN]);
+    }
+}
