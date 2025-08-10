@@ -3,8 +3,12 @@
 namespace Modules\Auth\Services;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Modules\Auth\Emails\VerificationCodeEmail;
 use Modules\Auth\Enums\ContactType;
 use Modules\Auth\Enums\VerificationActionType;
+use Modules\Auth\Http\Requests\SendVerificationRequest;
 
 class VerificationCodeService
 {
@@ -42,8 +46,51 @@ class VerificationCodeService
         return $cacheValue && now()->diffInSeconds( $cacheValue['expired_at']) > 0 ? $cacheValue['expired_at']->diffInSeconds(now()) : null;
     }
 
-    public function sendCode()
-    {}
 
+    public function forgetCode(string $contact , VerificationActionType $action , ContactType $contactType)
+    {
+        $cacheKey = $this->getCacheKey($contact, $action, $contactType);
+        Cache::forget($cacheKey);
+    }
+
+    public function sendCodeAsSms(SendVerificationRequest $request, string $contact , int $code) : bool
+    {
+        try {
+            $response = Http::withHeaders([
+                'apiKey' => config('auth.msgway.api_key'),
+            ])->post('https://api.msgway.com/send', [
+                'mobile' => $contact,
+                'method' => 'sms',
+                'templateID' => 3,
+                'params' => [
+                    (string) $code,
+                ],
+            ]);
+
+
+            $response->throw();
+
+            return $response->successful();
+        } catch (\Throwable $th) {
+            //throw $th;
+            $this->forgetCode($contact, $request->action , $request->contactType);
+
+            return false;
+        }
+    }
+
+    public function sendCodeAsMail(SendVerificationRequest $request, string $contact , int $code) : bool
+    {
+        try {
+            Mail::to($contact)->send(new VerificationCodeEmail($code));
+
+            return true;
+        } catch (\Throwable $th) {
+            //throw $th;
+            $this->forgetCode($contact, $request->action , $request->contactType);
+
+            return false;
+        }
+    }
     public function handle() {}
 }

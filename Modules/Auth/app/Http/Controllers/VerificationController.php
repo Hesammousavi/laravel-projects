@@ -3,8 +3,10 @@
 namespace Modules\Auth\Http\Controllers;
 
 use Illuminate\Routing\Controller;
+use Modules\Auth\Enums\ContactType;
 use Modules\Auth\Enums\VerificationActionType;
 use Modules\Auth\Http\Requests\SendVerificationRequest;
+use Modules\Auth\Http\Requests\VerifyVerificationRequest;
 use Modules\Auth\Services\VerificationCodeService;
 
 class VerificationController extends Controller {
@@ -18,13 +20,32 @@ class VerificationController extends Controller {
         // generate code
         $code = $this->verificationCodeService->generateCode(
             $request->input('contact'),
-            VerificationActionType::tryFrom($request->input('action')),
+            $request->action,
             $request->contactType,
         );
 
+        $responseStatus = false;
 
-        dd($code);
-        // as contanct ( send sms or email)
-        // send response to user
+        if($request->contactType === ContactType::EMAIL) {
+            // send email
+            $responseStatus = $this->verificationCodeService->sendCodeAsMail($request , $request->input('contact') , $code);
+        }
+
+        if($request->contactType === ContactType::PHONE) {
+            $responseStatus = $this->verificationCodeService->sendCodeAsSms($request , $request->input('contact') , $code);
+        }
+
+        if($responseStatus) {
+            return response()->json(__('auth::verification.code_sent_successfully'));
+        }
+
+        return response()->json([
+            'errors' => [
+                'contact' => [
+                    __('auth::verification.code_sending_failed')
+                ],
+            ],
+        ], 422);
     }
+
 }
