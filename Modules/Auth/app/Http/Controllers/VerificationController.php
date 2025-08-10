@@ -47,4 +47,9 @@ class VerificationController extends Controller {
             ],
         ], 422);
     }
+
+    public function verifyCode(VerifyVerificationRequest $request)
+    {
+        // next step is to verify the code
+    }
 }

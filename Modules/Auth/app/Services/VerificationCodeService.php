@@ -92,5 +92,19 @@ class VerificationCodeService
             return false;
         }
     }
-    public function handle() {}
+
+    public function verifyCode(string $contact , VerificationActionType $action , ContactType $contactType , string $code) : bool
+    {
+        $cacheKey = $this->getCacheKey($contact, $action, $contactType);
+        $cacheValue = Cache::get($cacheKey);
+
+
+
+        if( $cacheValue && now()->diffInSeconds($cacheValue['expired_at']) > 0 && (string) $cacheValue['code'] === $code) {
+            $this->forgetCode($contact, $action, $contactType);
+            return true;
+        }
+
+        return false;
+    }
 }
