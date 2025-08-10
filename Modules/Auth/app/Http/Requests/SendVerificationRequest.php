@@ -13,10 +13,13 @@ use Modules\Auth\Services\VerificationCodeService;
 class SendVerificationRequest extends FormRequest
 {
     public ContactType $contactType;
+    public VerificationActionType $action;
+
 
     public function prepareForValidation()
     {
         $this->contactType = ContactType::detectContactType($this->input('contact') ?? '');
+        $this->action = VerificationActionType::tryFrom($this->input('action') ?? '');
     }
 
     /**
@@ -49,7 +52,7 @@ class SendVerificationRequest extends FormRequest
                 }
 
                 $contact = $this->input('contact');
-                $action = VerificationActionType::tryFrom($this->input('action'));
+                $action = $this->action;
                 $contactType = $this->contactType;
 
                 $retryTime = (new VerificationCodeService)->getRetryTime($contact, $action, $contactType);
@@ -64,7 +67,7 @@ class SendVerificationRequest extends FormRequest
     public function getContactValidationRules(): array
     {
 
-        $verificaitonAction = VerificationActionType::tryFrom($this->input('action'));
+        $verificaitonAction = $this->action;
 
         if(!$verificaitonAction) {
             return [];
