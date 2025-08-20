@@ -3,11 +3,14 @@
 namespace Modules\Auth\Http\Controllers;
 
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Modules\Auth\Enums\ContactType;
 use Modules\Auth\Enums\VerificationActionType;
 use Modules\Auth\Http\Requests\SendVerificationRequest;
 use Modules\Auth\Http\Requests\VerifyVerificationRequest;
 use Modules\Auth\Services\VerificationCodeService;
+
 
 class VerificationController extends Controller {
 
@@ -51,5 +54,10 @@ class VerificationController extends Controller {
     public function verifyCode(VerifyVerificationRequest $request)
     {
         // next step is to verify the code
+        $token = $this->verificationCodeService->createVerificationToken($request);
+
+        return response()->json([
+            'token' => $token,
+        ]);
     }
 }

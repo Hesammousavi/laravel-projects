@@ -4,6 +4,7 @@ namespace Modules\Auth\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Auth\Http\Requests\RegisterRequest;
 use Modules\User\Models\User;
 
 class AuthController extends Controller
@@ -21,5 +22,13 @@ class AuthController extends Controller
         }
 
         return response()->json('user not found' , 404);
+    }
+
+    public function register(RegisterRequest $request)
+    {
+        return 'register is done';
+        // $user = User::create($request->validated());
+
+        // return response()->json('user created successfully');
     }
 }

@@ -5,13 +5,54 @@ namespace Modules\Auth\Services;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Modules\Auth\Emails\VerificationCodeEmail;
 use Modules\Auth\Enums\ContactType;
 use Modules\Auth\Enums\VerificationActionType;
 use Modules\Auth\Http\Requests\SendVerificationRequest;
+use Modules\Auth\Http\Requests\VerifyVerificationRequest;
 
 class VerificationCodeService
 {
+
+    public function createVerificationToken(VerifyVerificationRequest $request)
+    {
+        do {
+            $token = Str::random(100);
+        } while (Cache::has("verificaiton:after_verify:token:{$token}"));
+
+        Cache::put("verificaiton:after_verify:token:{$token}", [
+            'contact' => $request->input('contact'),
+            'action' => $request->action,
+            'contact_type' => $request->contactType,
+        ], now()->addMinutes(10));
+
+        return $token;
+    }
+
+    public function getVerificationToken(string $token , array $contactList, VerificationActionType $action)
+    {
+        $cacheKey = "verificaiton:after_verify:token:{$token}";
+        $tokenData = Cache::pull($cacheKey);
+
+        if(!$tokenData) {
+            return null;
+        }
+
+        $contact = $tokenData['contact_type'] === 'email' ? $contactList['email'] : $contactList['phone'];
+
+
+        if(
+            $tokenData['contact'] === $contact &&
+            $tokenData['action'] === $action->value
+        ) {
+            return $tokenData;
+        }
+
+
+        return null;
+    }
+
 
     public function getCacheKey(string $contact , VerificationActionType $action , ContactType $contactType)
     {
