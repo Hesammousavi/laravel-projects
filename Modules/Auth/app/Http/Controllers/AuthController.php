@@ -4,6 +4,7 @@ namespace Modules\Auth\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Modules\Auth\Actions\RegisterUser;
 use Modules\Auth\Http\Requests\RegisterRequest;
 use Modules\User\Models\User;
 
@@ -26,7 +27,9 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-        return 'register is done';
+        $user = (new RegisterUser)->handle($request);
+
+        return $user;
         // $user = User::create($request->validated());
 
         // return response()->json('user created successfully');

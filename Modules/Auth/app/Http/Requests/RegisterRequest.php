@@ -4,11 +4,15 @@ namespace Modules\Auth\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
+use Modules\Auth\Enums\ContactType;
 use Modules\Auth\Enums\VerificationActionType;
 use Modules\Auth\Services\VerificationCodeService;
 
 class RegisterRequest extends FormRequest
 {
+    public ContactType $contactType;
+    public string $contact;
+
     /**
      * Get the validation rules that apply to the request.
      */
@@ -67,7 +71,11 @@ class RegisterRequest extends FormRequest
 
                 if(!$tokenData) {
                     $validator->errors()->add('token', __('auth::validation.invalid_verification_token'));
+                    return;
                 }
+
+                $this->contactType = $tokenData['contact_type'];
+                $this->contact = $tokenData['contact'];
             }
         ];
     }

@@ -15,12 +15,14 @@ use Modules\Auth\Http\Requests\VerifyVerificationRequest;
 class VerificationCodeService
 {
 
+
     public function createVerificationToken(VerifyVerificationRequest $request)
     {
         do {
             $token = Str::random(100);
         } while (Cache::has("verificaiton:after_verify:token:{$token}"));
 
+        // check if token is already used
         Cache::put("verificaiton:after_verify:token:{$token}", [
             'contact' => $request->input('contact'),
             'action' => $request->action,
@@ -30,7 +32,7 @@ class VerificationCodeService
         return $token;
     }
 
-    public function getVerificationToken(string $token , array $contactList, VerificationActionType $action)
+    public function getVerificationToken(string $token , array $contactList, VerificationActionType $action) : ?array
     {
         $cacheKey = "verificaiton:after_verify:token:{$token}";
         $tokenData = Cache::pull($cacheKey);
@@ -39,12 +41,12 @@ class VerificationCodeService
             return null;
         }
 
-        $contact = $tokenData['contact_type'] === 'email' ? $contactList['email'] : $contactList['phone'];
+        $contact = $tokenData['contact_type'] === ContactType::EMAIL ? $contactList['email'] : $contactList['phone'];
 
 
         if(
             $tokenData['contact'] === $contact &&
-            $tokenData['action'] === $action->value
+            $tokenData['action'] === $action
         ) {
             return $tokenData;
         }

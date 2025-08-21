@@ -15,4 +15,5 @@ return [
     'contact_invalid_phone' => 'The :attribute must be a valid phone number.',
     'contact_retry_time' => 'Please wait :retry_time seconds before requesting another code.',
     'invalid_verification_code' => 'The verification code entered is incorrect.',
+    'invalid_verification_token' => 'The verification token is invalid or has expired.',
 ];
