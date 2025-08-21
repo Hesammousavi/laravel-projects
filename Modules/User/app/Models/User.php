@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Modules\Auth\Enums\ContactType;
 
 class User extends Authenticatable
 {
@@ -47,5 +48,20 @@ class User extends Authenticatable
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function verifiedContact(ContactType $contactType)
+    {
+        $dataVerification = [];
+
+        if($contactType === ContactType::EMAIL && is_null($this->email_verified_at)) {
+           $dataVerification['email_verified_at'] = now();
+        }
+
+        if($contactType === ContactType::PHONE && is_null($this->phone_verified_at)) {
+            $dataVerification['phone_verified_at'] = now();
+        }
+
+        $this->forceFill($dataVerification)->save();
     }
 }
