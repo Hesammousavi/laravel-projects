@@ -31,9 +31,18 @@ class AuthController extends Controller
         $user = (new RegisterUser)->handle($request);
 
         $token = $user->createToken('x_web_token' , expiresAt: now()->addDays(30))->plainTextToken;
+        $encryptedToken = Crypt::encryptString($token);
 
         return response()->json([
-            'token' => Crypt::encryptString($token),
-        ]);
+            'token' => $encryptedToken,
+        ])->withCookie(cookie(
+            'x_web_token' ,
+            $encryptedToken,
+            60 * 24 * 30, // 30 days
+            '/',
+            config('session.domain'),
+            true,
+            true,
+        ));
     }
 }
