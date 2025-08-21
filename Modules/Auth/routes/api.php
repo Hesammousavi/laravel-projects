@@ -21,5 +21,7 @@ Route::middleware([])->prefix('v1/auth')->group(function () {
             ->middleware('throttle:verification-code');
 
 
-    Route::post('register' , [AuthController::class , 'register']);
+    Route::post('register' , [AuthController::class , 'register'])
+        ->name('register')
+        ->middleware('throttle:auth_user');
 });

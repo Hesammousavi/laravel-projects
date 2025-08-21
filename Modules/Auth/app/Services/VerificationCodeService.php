@@ -27,12 +27,13 @@ class VerificationCodeService
             'contact' => $request->input('contact'),
             'action' => $request->action,
             'contact_type' => $request->contactType,
+            'identifier' => hash('sha256', $request->userAgent() . ':' . $request->ip()),
         ], now()->addMinutes(10));
 
         return $token;
     }
 
-    public function getVerificationToken(string $token , array $contactList, VerificationActionType $action) : ?array
+    public function getVerificationToken(string $token , array $contactList, VerificationActionType $action, string $identifier) : ?array
     {
         $cacheKey = "verificaiton:after_verify:token:{$token}";
         $tokenData = Cache::pull($cacheKey);
@@ -46,7 +47,8 @@ class VerificationCodeService
 
         if(
             $tokenData['contact'] === $contact &&
-            $tokenData['action'] === $action
+            $tokenData['action'] === $action &&
+            $tokenData['identifier'] === $identifier
         ) {
             return $tokenData;
         }

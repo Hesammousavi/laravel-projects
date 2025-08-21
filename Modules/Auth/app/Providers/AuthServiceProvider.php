@@ -34,13 +34,19 @@ class AuthServiceProvider extends ServiceProvider
         RateLimiter::for('check-user', function (Request $request) {
             return app()->isLocal()
                 ? Limit::none()
-                : Limit::perMinute(10, 5)->by($request->ip());
+                : Limit::perMinute(10, 5)->by($request->userAgent() . ':' . $request->ip());
         });
 
         RateLimiter::for('verification-code', function (Request $request) {
             return app()->isLocal()
                 ? Limit::none()
-                : Limit::perMinute(10, 20)->by($request->ip());
+                : Limit::perMinute(10, 20)->by($request->userAgent() . ':' . $request->ip());
+        });
+
+        RateLimiter::for('auth_user', function (Request $request) {
+            return app()->isLocal()
+                ? Limit::none()
+                : Limit::perMinute(10, decayMinutes: 30)->by($request->userAgent() . ':' . $request->ip());
         });
     }
 

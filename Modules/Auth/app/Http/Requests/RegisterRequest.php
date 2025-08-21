@@ -67,6 +67,7 @@ class RegisterRequest extends FormRequest
                         'phone' => $validatedData['phone'],
                     ],
                     VerificationActionType::REGISTER,
+                    hash('sha256', $this->userAgent() . ':' . $this->ip()),
                 );
 
                 if(!$tokenData) {
