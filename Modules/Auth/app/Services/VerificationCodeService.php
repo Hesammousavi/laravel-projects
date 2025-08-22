@@ -44,7 +44,6 @@ class VerificationCodeService
 
         $contact = $tokenData['contact_type'] === ContactType::EMAIL ? $contactList['email'] : $contactList['phone'];
 
-
         if(
             $tokenData['contact'] === $contact &&
             $tokenData['action'] === $action &&

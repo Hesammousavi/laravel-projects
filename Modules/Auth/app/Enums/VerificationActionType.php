@@ -5,6 +5,7 @@ namespace Modules\Auth\Enums;
 enum VerificationActionType : string {
     case REGISTER = 'register';
     case LOGIN = 'login';
+    case FORGOT_PASSWORD = 'forgot_password';
 
 
     public function isContactNeedToBeUnique(): bool
@@ -14,6 +15,6 @@ enum VerificationActionType : string {
 
     public function isContactNeedToBeExsit(): bool
     {
-        return in_array($this, haystack: [self::LOGIN]);
+        return in_array($this, haystack: [self::LOGIN, self::FORGOT_PASSWORD]);
     }
 }

@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Modules\Auth\Actions\ForgotPassword;
 use Modules\Auth\Actions\RegisterUser;
+use Modules\Auth\Http\Requests\ForgotPasswordRequest;
 use Modules\Auth\Http\Requests\LoginRequest;
 use Modules\Auth\Http\Requests\RegisterRequest;
 use Modules\User\Models\User;
@@ -22,10 +24,10 @@ class AuthController extends Controller
                 ->exists();
 
         if($user) {
-            return response()->json('user exsits');
+            return response()->json(__('auth::auth.user_exists'));
         }
 
-        return response()->json('user not found' , 404);
+        return response()->json(__('auth::auth.user_not_found'), 404);
     }
 
     public function login(LoginRequest $request)
@@ -36,6 +38,7 @@ class AuthController extends Controller
         $encryptedToken = Crypt::encryptString($token);
 
         return response()->json([
+            'message' => __('auth::auth.login_success'),
             'token' => $encryptedToken,
         ])->withCookie(cookie(
             'x_web_token' ,
@@ -56,6 +59,7 @@ class AuthController extends Controller
         $encryptedToken = Crypt::encryptString($token);
 
         return response()->json([
+            'message' => __('auth::auth.registration_success'),
             'token' => $encryptedToken,
         ])->withCookie(cookie(
             'x_web_token' ,
@@ -66,5 +70,22 @@ class AuthController extends Controller
             true,
             true,
         ));
+    }
+
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        try {
+            $user = (new ForgotPassword)->handle($request);
+
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => __('auth::auth.password_reset_failed'),
+            ], 500);
+        }
+
+        return response()->json([
+            'message' => __('auth::auth.password_reset_success'),
+        ]);
     }
 }

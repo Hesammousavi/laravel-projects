@@ -28,4 +28,8 @@ Route::middleware([])->prefix('v1/auth')->group(function () {
     Route::post('login' , [AuthController::class , 'login'])
         ->name('login')
         ->middleware('throttle:auth_user');
+
+    Route::post('forgot_password' , [AuthController::class , 'forgotPassword'])
+        ->name('forgot_password')
+        ->middleware('throttle:auth_user');
 });
