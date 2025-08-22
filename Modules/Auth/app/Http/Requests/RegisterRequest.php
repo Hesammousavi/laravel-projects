@@ -6,12 +6,17 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 use Modules\Auth\Enums\ContactType;
 use Modules\Auth\Enums\VerificationActionType;
+use Modules\Auth\Http\Requests\Base\BaseAuthRequest;
 use Modules\Auth\Services\VerificationCodeService;
 
-class RegisterRequest extends FormRequest
+class RegisterRequest extends BaseAuthRequest
 {
-    public ContactType $contactType;
     public string $contact;
+
+    public function prepareForValidation()
+    {
+        $this->action = VerificationActionType::REGISTER;
+    }
 
     /**
      * Get the validation rules that apply to the request.
@@ -57,21 +62,19 @@ class RegisterRequest extends FormRequest
                     return;
                 }
 
-
                 $validatedData = $this->validated();
 
-                $tokenData = (new VerificationCodeService)->getVerificationToken(
-                    $validatedData['token'],
+                $tokenData = $this->validateVerificationToken(
+                    $validator,
+                    $validatedData,
+                    $this->action,
                     [
                         'email' => $validatedData['email'],
-                        'phone' => $validatedData['phone'],
-                    ],
-                    VerificationActionType::REGISTER,
-                    hash('sha256', $this->userAgent() . ':' . $this->ip()),
+                        'phone' => $validatedData['phone']
+                    ]
                 );
 
                 if(!$tokenData) {
-                    $validator->errors()->add('token', __('auth::validation.invalid_verification_token'));
                     return;
                 }
 
@@ -79,13 +82,5 @@ class RegisterRequest extends FormRequest
                 $this->contact = $tokenData['contact'];
             }
         ];
-    }
-
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
     }
 }

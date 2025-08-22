@@ -8,18 +8,16 @@ use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Validator;
 use Modules\Auth\Enums\ContactType;
 use Modules\Auth\Enums\VerificationActionType;
+use Modules\Auth\Http\Requests\Base\BaseAuthRequest;
 use Modules\Auth\Services\VerificationCodeService;
 
-class SendVerificationRequest extends FormRequest
+class SendVerificationRequest extends BaseAuthRequest
 {
-    public ContactType $contactType;
-    public VerificationActionType $action;
-
 
     public function prepareForValidation()
     {
-        $this->contactType = ContactType::detectContactType($this->input('contact') ?? '');
-        $this->action = VerificationActionType::tryFrom($this->input('action') ?? '');
+        $this->prepareContactType();
+        $this->prepareAction();
     }
 
     /**
@@ -51,57 +49,8 @@ class SendVerificationRequest extends FormRequest
                     return;
                 }
 
-                $contact = $this->input('contact');
-                $action = $this->action;
-                $contactType = $this->contactType;
-
-                $retryTime = (new VerificationCodeService)->getRetryTime($contact, $action, $contactType);
-
-                if($retryTime) {
-                    $validator->errors()->add('contact', __('auth::validation.contact_retry_time', ['retry_time' => abs(round($retryTime))]));
-                }
+                $this->checkRetryTime($validator, $this->validated(), $this->action , $this->contactType);
             }
         ];
-    }
-
-    public function getContactValidationRules(): array
-    {
-
-        $verificaitonAction = $this->action;
-
-        if(!$verificaitonAction) {
-            return [];
-        }
-
-        if($this->contactType === ContactType::EMAIL) {
-            // email validation
-            return [
-                'email:rfc,dns',
-                Rule::when($verificaitonAction->isContactNeedToBeUnique(), [
-                    'unique:users,email',
-                ]),
-                Rule::when($verificaitonAction->isContactNeedToBeExsit(), [
-                    'exists:users,email',
-                ]),
-            ];
-        }
-
-        return [
-            'phone:mobile',
-            Rule::when($verificaitonAction->isContactNeedToBeUnique(), [
-                'unique:users,phone',
-            ]),
-            Rule::when($verificaitonAction->isContactNeedToBeExsit(), [
-                'exists:users,phone',
-            ]),
-        ];
-    }
-
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
     }
 }
