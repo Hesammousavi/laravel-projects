@@ -10,10 +10,13 @@ use Modules\Auth\Http\Requests\Base\BaseAuthRequest;
 
 class VerifyVerificationRequest extends BaseAuthRequest
 {
+    public string $identifier;
+    
     public function prepareForValidation()
     {
         $this->prepareContactType();
         $this->prepareAction();
+        $this->identifier = hash('sha256', $this->userAgent() . ':' . $this->ip());
     }
 
     /**
