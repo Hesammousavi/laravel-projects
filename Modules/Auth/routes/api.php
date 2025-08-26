@@ -6,31 +6,33 @@ use Modules\Auth\Http\Controllers\VerficationController;
 use Modules\Auth\Http\Controllers\VerificationController;
 use Modules\Auth\Http\Middleware\EnsureUserVerifiedMiddleware;
 
-// /api/v1/auth/check-user
-Route::middleware([])->withoutMiddleware(EnsureUserVerifiedMiddleware::class)->prefix('v1/auth')->group(function () {
-    Route::post('check-user', [AuthController::class, 'checkUser'])
-        ->name('check-user')
-        ->middleware('throttle:check-user');
+Route::withoutMiddleware(EnsureUserVerifiedMiddleware::class)
+->prefix('v1/auth')
+->group(function () {
 
+    Route::middleware(['throttle:verification-code'])
+    ->prefix('code-verification')
+    ->name('code-verification.')
+    ->group(function () {
+        Route::post('send', [VerificationController::class, 'sendCode'])
+            ->name('send-code');
 
-    Route::post('code-verification/send', [VerificationController::class, 'sendCode'])
-            ->name('code-verification.send-code')
-            ->middleware('throttle:verification-code');
+        Route::post('verify', [VerificationController::class, 'verifyCode'])
+            ->name('verify');
+    });
 
-    Route::post('code-verification/verify', [VerificationController::class, 'verifyCode'])
-            ->name('code-verification.verify')
-            ->middleware('throttle:verification-code');
+    Route::middleware(['guest' ,'throttle:auth_user'])->group(function () {
+        Route::post('check-user', [AuthController::class, 'checkUser'])
+            ->name('check-user')
+            ->middleware('throttle:check-user');
 
+        Route::post('register' , [AuthController::class , 'register'])
+            ->name('register');
 
-    Route::post('register' , [AuthController::class , 'register'])
-        ->name('register')
-        ->middleware('throttle:auth_user');
+        Route::post('login' , [AuthController::class , 'login'])
+            ->name('login');
 
-    Route::post('login' , [AuthController::class , 'login'])
-        ->name('login')
-        ->middleware('throttle:auth_user');
-
-    Route::post('forgot_password' , [AuthController::class , 'forgotPassword'])
-        ->name('forgot_password')
-        ->middleware('throttle:auth_user');
+        Route::post('forgot_password' , [AuthController::class , 'forgotPassword'])
+            ->name('forgot_password');
+    });
 });

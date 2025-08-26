@@ -19,7 +19,7 @@ trait HasUserAuthentication
         }
 
         $user->verifiedContact($this->contactType);
-        Auth::onceUsingId($user->id);
+        Auth::guard('web')->onceUsingId($user->id);
 
         return true;
     }
@@ -37,7 +37,7 @@ trait HasUserAuthentication
             'password' => $validatedData['password'],
         ];
 
-        if(!Auth::once($credentials)) {
+        if(!Auth::guard('web')->once($credentials)) {
             $validator->errors()->add('contact', __('auth::validation.invalid_credentials'));
             return;
         }
