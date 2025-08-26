@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Modules\Auth\Http\Middleware\CheckAuthenticatedUserIdentifierFromToken;
 use Modules\Auth\Http\Middleware\DecryptAuthenticateTokenMiddleware;
 use Modules\Auth\Http\Middleware\EnsureUserVerifiedMiddleware;
 
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->api(append:[
+            CheckAuthenticatedUserIdentifierFromToken::class,
             EnsureUserVerifiedMiddleware::class,
         ]);
     })

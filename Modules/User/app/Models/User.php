@@ -80,4 +80,9 @@ class User extends Authenticatable
             ContactType::PHONE->value => $this->phone_verified_at,
         ])->filter(fn($value) => is_null($value))->keys();
     }
+
+    public function identifierFromRequest()
+    {
+        return hash('sha256' , request()->userAgent() . ':' .request()->ip() . ':' . $this->id);
+    }
 }
