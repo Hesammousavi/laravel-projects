@@ -9,11 +9,6 @@ use Modules\Auth\Http\Middleware\EnsureUserVerifiedMiddleware;
 Route::withoutMiddleware(EnsureUserVerifiedMiddleware::class)
 ->prefix('v1/auth')
 ->group(function () {
-    Route::post('check-user', [AuthController::class, 'checkUser'])
-        ->name('check-user')
-        ->middleware('throttle:check-user');
-
-
     Route::middleware(['throttle:verification-code'])
     ->prefix('code-verification')
     ->name('code-verification.')
@@ -25,8 +20,11 @@ Route::withoutMiddleware(EnsureUserVerifiedMiddleware::class)
             ->name('verify');
     });
 
+    Route::middleware(['guest' ,'throttle:auth_user'])->group(function () {
+        Route::post('check-user', [AuthController::class, 'checkUser'])
+            ->name('check-user')
+            ->middleware('throttle:check-user');
 
-    Route::middleware(['throttle:auth_user'])->group(function () {
         Route::post('register' , [AuthController::class , 'register'])
             ->name('register');
 
@@ -36,5 +34,4 @@ Route::withoutMiddleware(EnsureUserVerifiedMiddleware::class)
         Route::post('forgot_password' , [AuthController::class , 'forgotPassword'])
             ->name('forgot_password');
     });
-
 });
