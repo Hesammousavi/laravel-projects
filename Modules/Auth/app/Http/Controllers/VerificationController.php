@@ -3,6 +3,7 @@
 namespace Modules\Auth\Http\Controllers;
 
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Modules\Auth\Enums\ContactType;
@@ -40,6 +41,10 @@ class VerificationController extends ApiController {
 
     public function verifyCode(VerifyVerificationRequest $request)
     {
+        if($request->action === VerificationActionType::VERIFY) {
+            return $this->makeVerifyUserContact($request);
+        }
+
         // next step is to verify the code
         $token = $this->verificationCodeService->createVerificationToken($request);
 
@@ -55,5 +60,21 @@ class VerificationController extends ApiController {
             ContactType::EMAIL => $this->verificationCodeService->sendCodeAsMail($request , $request->input('contact') , $code),
             ContactType::PHONE => $this->verificationCodeService->sendCodeAsSms($request , $request->input('contact') , $code)
         };
+    }
+
+    private function makeVerifyUserContact(VerifyVerificationRequest $request)
+    {
+        $user = Auth::user();
+        if(!$user) {
+            return $this->errorResponse(null , [
+                'contact' => [
+                    __('auth::verification.user_not_found')
+                ],
+            ] , code : 404);
+        }
+
+
+        $user->verifiedContact($request->contactType);
+        return $this->successResponse(__('auth::verification.contact_verified_successfully'));
     }
 }

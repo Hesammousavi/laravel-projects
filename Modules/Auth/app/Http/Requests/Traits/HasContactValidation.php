@@ -2,7 +2,10 @@
 
 namespace Modules\Auth\Http\Requests\Traits;
 
+use Illuminate\Support\Facades\Auth;
 use Modules\Auth\Enums\ContactType;
+use Modules\Auth\Enums\VerificationActionType;
+use Modules\Auth\Rules\ContactBelongsToAuthenticatedUser;
 
 trait HasContactValidation
 {
@@ -27,6 +30,10 @@ trait HasContactValidation
             if ($this->action->isContactNeedToBeExsit()) {
                 $rules[] = 'exists:users,email';
             }
+
+            if($this->action === VerificationActionType::VERIFY) {
+                $rules[] = new ContactBelongsToAuthenticatedUser();
+            }
         }
 
         return $rules;
@@ -46,6 +53,10 @@ trait HasContactValidation
             }
             if ($this->action->isContactNeedToBeExsit()) {
                 $rules[] = 'exists:users,phone';
+            }
+
+            if($this->action === VerificationActionType::VERIFY) {
+                $rules[] = new ContactBelongsToAuthenticatedUser();
             }
         }
 

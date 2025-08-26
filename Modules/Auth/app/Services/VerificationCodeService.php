@@ -88,7 +88,7 @@ class VerificationCodeService
     {
         $codeData = $this->codeService->get($contact, $action, $contactType);
 
-        return ( $codeData && now()->isAfter( $codeData['expired_at']) )
+        return ( $codeData && now()->isBefore( $codeData['expired_at']) )
             ? $codeData['expired_at']->diffInSeconds(now())
             : null;
     }
@@ -130,7 +130,7 @@ class VerificationCodeService
 
         if(
             $cacheData &&
-            now()->isAfter($cacheData['expired_at']) &&
+            now()->isBefore($cacheData['expired_at']) &&
             (string) $cacheData['code'] === $code
         ) {
             $this->codeService->forget($contact, $action, $contactType);
