@@ -64,4 +64,12 @@ class User extends Authenticatable
 
         $this->forceFill($dataVerification)->save();
     }
+
+    public function unverifiedContacts()
+    {
+        return collect([
+            ContactType::EMAIL->value => $this->email_verified_at,
+            ContactType::PHONE->value => $this->phone_verified_at,
+        ])->filter(fn($value) => is_null($value))->keys();
+    }
 }

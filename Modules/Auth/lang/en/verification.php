@@ -16,6 +16,7 @@ return [
     'contact_not_belongs_to_authenticated_user' => 'The selected contact does not belong to the authenticated user.',
     'user_not_found' => 'User not found.',
     'contact_verified_successfully' => 'Contact verified successfully.',
+    'please_verify_contact_before_proceeding' => 'Please verify your contact information before proceeding',
 
     // Action-specific messages
     'register' => [
