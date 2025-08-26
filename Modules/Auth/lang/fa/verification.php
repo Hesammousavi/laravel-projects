@@ -16,6 +16,7 @@ return [
     'contact_not_belongs_to_authenticated_user' => 'اطلاعات تماس انتخاب شده متعلق به کاربر احراز هویت شده نیست.',
     'user_not_found' => 'کاربر یافت نشد.',
     'contact_verified_successfully' => 'اطلاعات تماس با موفقیت تایید شد.',
+    'contact_changed_successfully' => 'اطلاعات تماس با موفقیت تغییر یافت.',
     'please_verify_contact_before_proceeding' => 'لطفاً اطلاعات تماس خود را قبل از ادامه تایید کنید',
 
     // Action-specific messages

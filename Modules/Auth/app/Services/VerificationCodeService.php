@@ -2,7 +2,9 @@
 
 namespace Modules\Auth\Services;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Modules\Auth\Emails\VerificationCodeEmail;
@@ -131,7 +133,8 @@ class VerificationCodeService
         if(
             $cacheData &&
             now()->isBefore($cacheData['expired_at']) &&
-            (string) $cacheData['code'] === $code
+            (string) $cacheData['code'] === $code &&
+            ( ($action === VerificationActionType::CHANGE_INFO ) ? ( isset($cacheData['user_id']) && $cacheData['user_id'] === Auth::id() ) : true )
         ) {
             $this->codeService->forget($contact, $action, $contactType);
 

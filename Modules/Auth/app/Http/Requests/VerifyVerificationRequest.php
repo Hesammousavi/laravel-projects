@@ -2,7 +2,7 @@
 
 namespace Modules\Auth\Http\Requests;
 
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Validator;
 use Modules\Auth\Enums\VerificationActionType;
@@ -11,13 +11,23 @@ use Modules\Auth\Http\Requests\Base\BaseAuthRequest;
 class VerifyVerificationRequest extends BaseAuthRequest
 {
     public string $identifier;
-    
+
     public function prepareForValidation()
     {
         $this->prepareContactType();
         $this->prepareAction();
         $this->identifier = hash('sha256', $this->userAgent() . ':' . $this->ip());
     }
+
+    public function authorize(): bool
+    {
+        if($this->action === VerificationActionType::CHANGE_INFO && !Auth::check()) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     /**
      * Get the validation rules that apply to the request.

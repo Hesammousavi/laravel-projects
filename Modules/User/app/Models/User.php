@@ -65,6 +65,14 @@ class User extends Authenticatable
         $this->forceFill($dataVerification)->save();
     }
 
+    public function changeContact(ContactType $contactType , string $contact)
+    {
+        $this->forceFill([
+            $contactType->value => $contact,
+            $contactType->value . '_verified_at' => now(),
+        ])->save();
+    }
+
     public function unverifiedContacts()
     {
         return collect([

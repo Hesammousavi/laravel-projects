@@ -45,6 +45,10 @@ class VerificationController extends ApiController {
             return $this->makeVerifyUserContact($request);
         }
 
+        if($request->action === VerificationActionType::CHANGE_INFO) {
+            return $this->makeChangeInfoContact($request);
+        }
+
         // next step is to verify the code
         $token = $this->verificationCodeService->createVerificationToken($request);
 
@@ -65,16 +69,14 @@ class VerificationController extends ApiController {
     private function makeVerifyUserContact(VerifyVerificationRequest $request)
     {
         $user = Auth::user();
-        if(!$user) {
-            return $this->errorResponse(null , [
-                'contact' => [
-                    __('auth::verification.user_not_found')
-                ],
-            ] , code : 404);
-        }
-
-
         $user->verifiedContact($request->contactType);
         return $this->successResponse(__('auth::verification.contact_verified_successfully'));
+    }
+
+    private function makeChangeInfoContact(VerifyVerificationRequest $request)
+    {
+        $user = Auth::user();
+        $user->changeContact($request->contactType , $request->input('contact'));
+        return $this->successResponse(__('auth::verification.contact_changed_successfully'));
     }
 }

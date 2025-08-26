@@ -3,6 +3,7 @@
 namespace Modules\Auth\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Validator;
@@ -18,6 +19,15 @@ class SendVerificationRequest extends BaseAuthRequest
     {
         $this->prepareContactType();
         $this->prepareAction();
+    }
+
+    public function authorize(): bool
+    {
+        if($this->action === VerificationActionType::CHANGE_INFO && !Auth::check()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
