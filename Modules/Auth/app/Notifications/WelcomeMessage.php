@@ -9,9 +9,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use Modules\Base\Notification\Channels\SmsChannel;
 use Throwable;
 
-class WelcomeMessage extends Notification implements ShouldQueue
+class WelcomeMessage extends Notification
 {
     use Queueable;
 
@@ -32,7 +33,7 @@ class WelcomeMessage extends Notification implements ShouldQueue
      */
     public function via($notifiable): array
     {
-        return ['mail'];
+        return [SmsChannel::class];
     }
 
     /**
@@ -46,6 +47,14 @@ class WelcomeMessage extends Notification implements ShouldQueue
             ->line('Thank you for registering with us. We are glad to have you on board.')
             ->action('Dashboard', url('/dashboard'))
             ->line('Thank you for using our application!');
+    }
+
+    public function toSms($notifiable)
+    {
+        return [
+            'phone_number' => '09111111100',
+            'message' => 'سلام'
+        ];
     }
 
     /**
