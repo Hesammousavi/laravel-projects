@@ -3,7 +3,10 @@
 namespace Modules\User\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use DefStudio\Telegraph\Models\TelegraphChat;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -23,6 +26,7 @@ class User extends Authenticatable
         'name',
         'email',
         'phone',
+        'telegram_chat_id',
         'password',
     ];
 
@@ -84,5 +88,27 @@ class User extends Authenticatable
     public function identifierFromRequest()
     {
         return hash('sha256' , request()->userAgent() . ':' .request()->ip() . ':' . $this->id);
+    }
+
+    public function telegramChat(): HasOne
+    {
+        return $this->hasOne(TelegraphChat::class , 'id' , 'telegram_chat_id');
+    }
+
+
+    public function makeTelegramBotRegisterCommand() : ?string
+    {
+        if($this->telegram_chat_id) {
+            return null;
+        }
+
+        $data = [
+            'user_id' => $this->id,
+            'timestamp' => now()
+        ];
+
+        $token = encrypt($data);
+
+        return "/login {$token}";
     }
 }
