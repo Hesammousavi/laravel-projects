@@ -111,4 +111,10 @@ class User extends Authenticatable
 
         return "/login {$token}";
     }
+
+
+    public function notificationPreferences()
+    {
+        return $this->hasOne(UserNotificationPreference::class);
+    }
 }

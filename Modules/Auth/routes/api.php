@@ -8,16 +8,6 @@ use Modules\Auth\Http\Middleware\EnsureUserVerifiedMiddleware;
 use Modules\Auth\Notifications\WelcomeMessage;
 use Modules\User\Models\User;
 
-Route::get('test', function() {
-    $user = User::find(4);
-    $user->notify((new WelcomeMessage));
-
-    return response()->json([
-        'message' => 'send notification was successful'
-    ]);
-});
-
-
 Route::withoutMiddleware(EnsureUserVerifiedMiddleware::class)
 ->prefix('v1/auth')
 ->group(function () {
