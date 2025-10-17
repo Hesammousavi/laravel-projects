@@ -19,7 +19,8 @@ return [
         'channels' => [
             'email' => 'mail',
             'sms' => SmsChannel::class,
-            'telegram' => TelegramChannel::class
+            'telegram' => TelegramChannel::class,
+            'database' => 'database'
         ]
     ]
 ];
