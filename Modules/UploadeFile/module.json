@@ -1,0 +1,11 @@
+{
+    "name": "UploadeFile",
+    "alias": "uploadefile",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\UploadeFile\\Providers\\UploadeFileServiceProvider"
+    ],
+    "files": ["app/helpers.php"]
+}

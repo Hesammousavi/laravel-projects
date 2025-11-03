@@ -2,5 +2,6 @@
     "Auth": true,
     "User": true,
     "Base": true,
-    "TelegramBot": true
+    "TelegramBot": true,
+    "UploadeFile": true
 }
