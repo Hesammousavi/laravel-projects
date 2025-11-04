@@ -2,7 +2,11 @@
 
 namespace Modules\UploadeFile\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
@@ -27,6 +31,12 @@ class UploadeFileServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+
+        RateLimiter::for('upload-file', function (Request $request) {
+            return app()->isLocal()
+                ? Limit::none()
+                : Limit::perMinute(10, 5)->by($request->user()?->id ?? $request->ip);
+        });
     }
 
     /**
