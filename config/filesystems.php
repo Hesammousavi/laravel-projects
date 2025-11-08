@@ -47,7 +47,7 @@ return [
             'report' => false,
         ],
 
-        's3' => [
+        's3-public' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
             'secret' => env('AWS_SECRET_ACCESS_KEY'),
@@ -56,6 +56,21 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+
+        's3-private' => [
+            'driver' => 's3',
+            'key' => env('AWS_PRIVATE_ACCESS_KEY_ID'),
+            'secret' => env('AWS_PRIVATE_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_PRIVATE_DEFAULT_REGION'),
+            'bucket' => env('AWS_PRIVATE_BUCKET'),
+            'url' => env('AWS_PRIVATE_URL'),
+            'endpoint' => env('AWS_PRIVATE_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_PRIVATE_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
             'report' => false,
         ],

@@ -25,7 +25,9 @@ class UserController extends Controller
         ]);
 
 
-        $files = FileUploadService::make(DiskType::PUBLIC)
+        return Storage::disk(DiskType::S3_PRIVATE)->download('/users/coveres/user-9/2025/11/04/01K9732Y97HPZCW36EY8VMZ9G4.webp');
+
+        $files = FileUploadService::make(DiskType::S3_PRIVATE)
             ->uploadUserCover($request->file('cover') , $request->user());
 
 

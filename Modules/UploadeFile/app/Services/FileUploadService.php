@@ -86,7 +86,7 @@ use Modules\User\Models\User;
 
         $nameWithPath = "$path/$name.{$fileType['extension']}";
 
-        Storage::disk('public')->put($nameWithPath , (string) $convertedImage);
+        Storage::disk($this->disk)->put($nameWithPath , (string) $convertedImage);
 
         $file = $this->storeUploadedFileInDB([
             'original_name' => pathinfo($file->getClientOriginalName() , PATHINFO_FILENAME),
